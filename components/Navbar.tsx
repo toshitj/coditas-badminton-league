@@ -57,17 +57,16 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Coditas Logo */}
+        <div className="flex items-center justify-between h-20 gap-4">
+          {/* CBL Logo */}
           <Link href="/" className="shrink-0">
             <Image
-              src="https://coditas-brand-assets.web.app/logos/gradient.png"
-              alt="Coditas"
-              width={110}
-              height={28}
-              className="h-7 w-auto object-contain"
+              src="/assets/cbl.png"
+              alt="Coditas Badminton League"
+              width={200}
+              height={64}
+              className="h-16 w-auto object-contain"
               priority
-              unoptimized
             />
           </Link>
 

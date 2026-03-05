@@ -24,6 +24,81 @@ function IconBulletList({
   );
 }
 
+function ShuttleSvg({ color }: { color: string }) {
+  return (
+    <svg viewBox="0 0 56 76" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+      {/* Feather skirt ring */}
+      <ellipse cx="28" cy="16" rx="22" ry="8" stroke={color} strokeWidth="1.5" strokeOpacity="0.85" />
+      {/* Feather lines from skirt to cork */}
+      <line x1="6"  y1="16" x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      <line x1="11" y1="9"  x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      <line x1="19" y1="8"  x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      <line x1="28" y1="8"  x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      <line x1="37" y1="8"  x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      <line x1="45" y1="9"  x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      <line x1="50" y1="16" x2="28" y2="64" stroke={color} strokeWidth="1" strokeOpacity="0.55" />
+      {/* Cork base */}
+      <circle cx="28" cy="67" r="5" fill={color} fillOpacity="0.85" />
+      <ellipse cx="28" cy="69.5" rx="5" ry="2.5" fill={color} fillOpacity="0.5" />
+    </svg>
+  );
+}
+
+const SHUTTLES = [
+  { top: "2%",  left: "4%",  size: 56, rotate: -15, delay: 0,   duration: 8,  color: "#9900E6", opacity: 0.13 },
+  { top: "6%",  left: "87%", size: 72, rotate: 30,  delay: 1.2, duration: 10, color: "#11CAE6", opacity: 0.11 },
+  { top: "52%", left: "1%",  size: 46, rotate: -45, delay: 2.5, duration: 9,  color: "#5B0FFE", opacity: 0.10 },
+  { top: "63%", left: "89%", size: 62, rotate: 20,  delay: 0.8, duration: 11, color: "#9900E6", opacity: 0.09 },
+  { top: "80%", left: "43%", size: 50, rotate: -30, delay: 3.5, duration: 7,  color: "#11CAE6", opacity: 0.09 },
+  { top: "36%", left: "93%", size: 40, rotate: 55,  delay: 1.8, duration: 12, color: "#5B0FFE", opacity: 0.08 },
+];
+
+function RacketSvg({ color, clipId }: { color: string; clipId: string }) {
+  return (
+    <svg viewBox="0 0 50 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+      <defs>
+        <clipPath id={clipId}>
+          <ellipse cx="25" cy="38" rx="18" ry="26" />
+        </clipPath>
+      </defs>
+      {/* Handle */}
+      <rect x="21.5" y="90" width="7" height="26" rx="3.5" fill={color} fillOpacity="0.75" />
+      {/* Grip wrap detail */}
+      <line x1="21.5" y1="97"  x2="28.5" y2="97"  stroke={color} strokeWidth="1" strokeOpacity="0.4" />
+      <line x1="21.5" y1="103" x2="28.5" y2="103" stroke={color} strokeWidth="1" strokeOpacity="0.4" />
+      <line x1="21.5" y1="109" x2="28.5" y2="109" stroke={color} strokeWidth="1" strokeOpacity="0.4" />
+      {/* Shaft */}
+      <line x1="25" y1="64" x2="25" y2="90" stroke={color} strokeWidth="2.5" strokeOpacity="0.7" strokeLinecap="round" />
+      {/* Head frame */}
+      <ellipse cx="25" cy="38" rx="20" ry="28" stroke={color} strokeWidth="2" strokeOpacity="0.85" />
+      {/* Strings (clipped to head oval) */}
+      <g clipPath={`url(#${clipId})`} stroke={color} strokeWidth="0.75" strokeOpacity="0.45">
+        {/* Horizontal strings */}
+        <line x1="5" y1="18" x2="45" y2="18" />
+        <line x1="5" y1="25" x2="45" y2="25" />
+        <line x1="5" y1="32" x2="45" y2="32" />
+        <line x1="5" y1="38" x2="45" y2="38" />
+        <line x1="5" y1="45" x2="45" y2="45" />
+        <line x1="5" y1="52" x2="45" y2="52" />
+        <line x1="5" y1="58" x2="45" y2="58" />
+        {/* Vertical strings */}
+        <line x1="12" y1="10" x2="12" y2="66" />
+        <line x1="18" y1="10" x2="18" y2="66" />
+        <line x1="25" y1="10" x2="25" y2="66" />
+        <line x1="32" y1="10" x2="32" y2="66" />
+        <line x1="38" y1="10" x2="38" y2="66" />
+      </g>
+    </svg>
+  );
+}
+
+const RACKETS = [
+  { top: "22%", left: "3%",  size: 52, rotate: 28,  delay: 0.6, duration: 9,  color: "#11CAE6", opacity: 0.11 },
+  { top: "68%", left: "5%",  size: 58, rotate: -22, delay: 2.3, duration: 11, color: "#5B0FFE", opacity: 0.10 },
+  { top: "12%", left: "79%", size: 46, rotate: 42,  delay: 1.4, duration: 8,  color: "#9900E6", opacity: 0.11 },
+  { top: "82%", left: "78%", size: 50, rotate: -18, delay: 3.1, duration: 10, color: "#11CAE6", opacity: 0.10 },
+];
+
 export default function OverviewPage() {
 
   return (
@@ -35,18 +110,30 @@ export default function OverviewPage() {
         className="relative"
       >
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, #9900E6 0%, #11CAE6 70%, transparent 100%)" }}
-            animate={{ scale: [1, 1.15, 1] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute left-0 bottom-0 w-[400px] h-[400px] rounded-full opacity-[0.06]"
-            style={{ background: "radial-gradient(circle, #5B0FFE 0%, #11CAE6 70%, transparent 100%)" }}
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          />
+          {SHUTTLES.map((s, i) => (
+            <motion.div
+              key={`shuttle-${i}`}
+              className="absolute"
+              style={{ top: s.top, left: s.left, width: s.size, opacity: s.opacity }}
+              initial={{ rotate: s.rotate }}
+              animate={{ y: [0, -22, 0], rotate: [s.rotate, s.rotate + 10, s.rotate] }}
+              transition={{ duration: s.duration, repeat: Infinity, ease: "easeInOut", delay: s.delay }}
+            >
+              <ShuttleSvg color={s.color} />
+            </motion.div>
+          ))}
+          {RACKETS.map((r, i) => (
+            <motion.div
+              key={`racket-${i}`}
+              className="absolute"
+              style={{ top: r.top, left: r.left, width: r.size, opacity: r.opacity }}
+              initial={{ rotate: r.rotate }}
+              animate={{ y: [0, -18, 0], rotate: [r.rotate, r.rotate + 10, r.rotate] }}
+              transition={{ duration: r.duration, repeat: Infinity, ease: "easeInOut", delay: r.delay }}
+            >
+              <RacketSvg color={r.color} clipId={`racket-clip-${i}`} />
+            </motion.div>
+          ))}
         </div>
 
         <div className="text-center space-y-6 mb-16">
