@@ -1,0 +1,52 @@
+name: Deploy NextJS to S3 + CloudFront
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      AWS_REGION: ap-south-1
+      BUCKET_NAME: ${{ vars.S3_BUCKET }}
+      DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build NextJS
+        run: npm run build
+
+      - name: Upload static assets to S3
+        run: |
+          aws s3 sync out/_next/static s3://$BUCKET_NAME/_next/static \
+          --delete \
+          --cache-control "public,max-age=31536000,immutable"
+
+      - name: Upload HTML and other files
+        run: |
+          aws s3 sync out s3://$BUCKET_NAME \
+          --exclude "_next/static/*" \
+          --delete \
+          --cache-control "no-cache"
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id $DISTRIBUTION_ID \
+          --paths "/index.html" "/404.html"
