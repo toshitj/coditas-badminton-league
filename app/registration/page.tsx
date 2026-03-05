@@ -6,7 +6,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type FieldErrors, type UseFormRegister } from "react-hook-form";
+import { useForm, type FieldErrors, type UseFormRegister, type UseFormSetValue } from "react-hook-form";
+import { cn } from "@/lib/utils";
 import * as z from "zod";
 import { CheckCircle2, Loader2, X } from "lucide-react";
 
@@ -124,13 +125,71 @@ function PlayerFields({
   labelPrefix,
   register,
   errors,
+  setValue,
 }: {
   prefix: PlayerPrefix;
   labelPrefix: string;
   register: UseFormRegister<TeamDetailsFormData>;
   errors: FieldErrors<TeamDetailsFormData>;
+  setValue: UseFormSetValue<TeamDetailsFormData>;
 }) {
   type FieldName = keyof TeamDetailsFormData & string;
+
+  const [lookupStatus, setLookupStatus] = useState<"idle" | "loading" | "found">("idle");
+  const [autoFilledKeys, setAutoFilledKeys] = useState(new Set<string>());
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEmployeeIdChange = (value: string) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    const trimmed = value.trim();
+
+    // Immediately clear any previously auto-filled values
+    if (autoFilledKeys.size > 0) {
+      for (const key of autoFilledKeys) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setValue(key as keyof TeamDetailsFormData, "" as any, { shouldValidate: false });
+      }
+      setAutoFilledKeys(new Set());
+    }
+
+    if (trimmed.length < 3) {
+      setLookupStatus("idle");
+      return;
+    }
+
+    // Show loading immediately so "Fetching..." placeholders appear right away
+    setLookupStatus("loading");
+
+    timerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/employee-lookup?employeeId=${encodeURIComponent(trimmed)}`);
+        if (!res.ok) { setLookupStatus("idle"); return; }
+        const { employee } = await res.json();
+        if (!employee) { setLookupStatus("idle"); return; }
+
+        const filled = new Set<string>();
+        const toFill = [
+          { suffix: "Name",          value: employee.name  },
+          { suffix: "Email",         value: employee.email },
+          { suffix: "ContactNumber", value: employee.phone },
+          { suffix: "Dob",           value: employee.dob   },
+        ];
+        for (const f of toFill) {
+          if (f.value) {
+            setValue(`${prefix}${f.suffix}` as keyof TeamDetailsFormData, f.value, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            filled.add(`${prefix}${f.suffix}`);
+          }
+        }
+        setAutoFilledKeys(filled);
+        setLookupStatus("found");
+      } catch {
+        setLookupStatus("idle");
+      }
+    }, 600);
+  };
 
   const field_error = (field: FieldName): string | undefined => {
     const message = (errors as Record<string, { message?: unknown }>)[field]?.message;
@@ -138,6 +197,8 @@ function PlayerFields({
   };
 
   const field_id = (suffix: string) => `${prefix}${suffix}`;
+
+  const AUTO_FILL_SUFFIXES = new Set(["Name", "Email", "ContactNumber", "Dob"]);
 
   const render_text_field = ({
     suffix,
@@ -156,6 +217,7 @@ function PlayerFields({
   }) => {
     const name = field_id(suffix) as FieldName;
     const message = field_error(name);
+    const isAutoFilled = autoFilledKeys.has(name);
     const field = register(name as keyof TeamDetailsFormData);
 
     return (
@@ -166,6 +228,7 @@ function PlayerFields({
           type={type}
           inputMode={inputMode}
           maxLength={maxLength}
+          placeholder={AUTO_FILL_SUFFIXES.has(suffix) && lookupStatus === "loading" ? "Fetching..." : undefined}
           {...field}
           onChange={(e) => {
             if (sanitizeDigitsMax) {
@@ -174,17 +237,53 @@ function PlayerFields({
             }
             field.onChange(e);
           }}
-          className={message ? "border-red-500" : ""}
+          className={cn(
+            message ? "border-red-500" : isAutoFilled ? "border-emerald-300 bg-emerald-50/40" : "",
+          )}
         />
         {message ? <p className="text-red-500 text-sm">{message}</p> : null}
       </div>
     );
   };
 
+  // Employee ID field — rendered separately to attach the lookup behaviour
+  const empIdName = field_id("EmployeeId") as FieldName;
+  const empIdError = field_error(empIdName);
+  const empIdField = register(empIdName as keyof TeamDetailsFormData);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {render_text_field({ suffix: "EmployeeId", label: `${labelPrefix} Employee ID *` })}
+        {/* Employee ID with directory auto-lookup */}
+        <div className="space-y-2">
+          <Label htmlFor={empIdName}>{`${labelPrefix} Employee ID *`}</Label>
+          <div className="relative">
+            <Input
+              id={empIdName}
+              {...empIdField}
+              onChange={(e) => {
+                empIdField.onChange(e);
+                handleEmployeeIdChange(e.target.value);
+              }}
+              className={cn(
+                empIdError ? "border-red-500" : lookupStatus === "found" ? "border-emerald-300" : "",
+                "pr-8",
+              )}
+            />
+            {lookupStatus === "loading" && (
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                <Loader2 className="w-4 h-4 animate-spin text-brand-violet" />
+              </div>
+            )}
+            {lookupStatus === "found" && (
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              </div>
+            )}
+          </div>
+          {empIdError && <p className="text-red-500 text-sm">{empIdError}</p>}
+        </div>
+
         {render_text_field({ suffix: "Name", label: `${labelPrefix} Name *` })}
       </div>
 
@@ -256,6 +355,10 @@ export default function RegistrationPage() {
 
   const [qrSrc, setQrSrc] = useState<string>("/assets/Team-2000.JPG");
 
+  const [individualLookupStatus, setIndividualLookupStatus] = useState<"idle" | "loading" | "found">("idle");
+  const [individualAutoFilled, setIndividualAutoFilled] = useState(new Set<string>());
+  const individualLookupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const teamForm = useForm<TeamDetailsFormData>({
     resolver: zodResolver(team_details_schema),
     mode: "onChange",
@@ -303,6 +406,48 @@ export default function RegistrationPage() {
   const canSubmit = useMemo(() => {
     return canProceed && paymentForm.formState.isValid && hasAccepted && !isSubmitting;
   }, [canProceed, hasAccepted, isSubmitting, paymentForm.formState.isValid]);
+
+  const handleIndividualEmployeeIdChange = (value: string) => {
+    if (individualLookupTimer.current) clearTimeout(individualLookupTimer.current);
+    const trimmed = value.trim();
+
+    // Immediately clear any previously auto-filled values
+    if (individualAutoFilled.size > 0) {
+      if (individualAutoFilled.has("playerName"))          individualForm.setValue("playerName",          "", { shouldValidate: false });
+      if (individualAutoFilled.has("playerEmail"))         individualForm.setValue("playerEmail",         "", { shouldValidate: false });
+      if (individualAutoFilled.has("playerContactNumber")) individualForm.setValue("playerContactNumber", "", { shouldValidate: false });
+      if (individualAutoFilled.has("playerDob"))           individualForm.setValue("playerDob",           "", { shouldValidate: false });
+      setIndividualAutoFilled(new Set());
+    }
+
+    if (trimmed.length < 3) {
+      setIndividualLookupStatus("idle");
+      return;
+    }
+
+    // Show loading immediately so "Fetching..." placeholders appear right away
+    setIndividualLookupStatus("loading");
+
+    individualLookupTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/employee-lookup?employeeId=${encodeURIComponent(trimmed)}`);
+        if (!res.ok) { setIndividualLookupStatus("idle"); return; }
+        const { employee } = await res.json();
+        if (!employee) { setIndividualLookupStatus("idle"); return; }
+
+        const filled = new Set<string>();
+        if (employee.name)  { individualForm.setValue("playerName",          employee.name,  { shouldValidate: true }); filled.add("playerName"); }
+        if (employee.email) { individualForm.setValue("playerEmail",         employee.email, { shouldValidate: true }); filled.add("playerEmail"); }
+        if (employee.phone) { individualForm.setValue("playerContactNumber", employee.phone, { shouldValidate: true }); filled.add("playerContactNumber"); }
+        if (employee.dob)   { individualForm.setValue("playerDob",           employee.dob,   { shouldValidate: true }); filled.add("playerDob"); }
+
+        setIndividualAutoFilled(filled);
+        setIndividualLookupStatus("found");
+      } catch {
+        setIndividualLookupStatus("idle");
+      }
+    }, 600);
+  };
 
   const build_team_payload = ({
     details,
@@ -516,6 +661,7 @@ export default function RegistrationPage() {
                       labelPrefix="Male Player 1"
                       register={teamForm.register}
                       errors={teamForm.formState.errors}
+                      setValue={teamForm.setValue}
                     />
                     <div className="h-px bg-border/60" />
                     <PlayerFields
@@ -523,6 +669,7 @@ export default function RegistrationPage() {
                       labelPrefix="Male Player 2"
                       register={teamForm.register}
                       errors={teamForm.formState.errors}
+                      setValue={teamForm.setValue}
                     />
                   </div>
                 </motion.div>
@@ -540,6 +687,7 @@ export default function RegistrationPage() {
                       labelPrefix="Female Player 1"
                       register={teamForm.register}
                       errors={teamForm.formState.errors}
+                      setValue={teamForm.setValue}
                     />
                     <div className="h-px bg-border/60" />
                     <PlayerFields
@@ -547,6 +695,7 @@ export default function RegistrationPage() {
                       labelPrefix="Female Player 2"
                       register={teamForm.register}
                       errors={teamForm.formState.errors}
+                      setValue={teamForm.setValue}
                     />
                   </div>
                 </motion.div>
@@ -562,13 +711,38 @@ export default function RegistrationPage() {
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Employee ID with directory auto-lookup */}
                     <div className="space-y-2">
                       <Label htmlFor="playerEmployeeId">Employee ID *</Label>
-                      <Input
-                        id="playerEmployeeId"
-                        {...individualForm.register("playerEmployeeId")}
-                        className={individualForm.formState.errors.playerEmployeeId ? "border-red-500" : ""}
-                      />
+                      <div className="relative">
+                        {(() => {
+                          const field = individualForm.register("playerEmployeeId");
+                          return (
+                            <Input
+                              id="playerEmployeeId"
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleIndividualEmployeeIdChange(e.target.value);
+                              }}
+                              className={cn(
+                                individualForm.formState.errors.playerEmployeeId ? "border-red-500" : individualLookupStatus === "found" ? "border-emerald-300" : "",
+                                "pr-8",
+                              )}
+                            />
+                          );
+                        })()}
+                        {individualLookupStatus === "loading" && (
+                          <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                            <Loader2 className="w-4 h-4 animate-spin text-brand-violet" />
+                          </div>
+                        )}
+                        {individualLookupStatus === "found" && (
+                          <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          </div>
+                        )}
+                      </div>
                       {individualForm.formState.errors.playerEmployeeId ? (
                         <p className="text-red-500 text-sm">
                           {individualForm.formState.errors.playerEmployeeId.message}
@@ -580,8 +754,12 @@ export default function RegistrationPage() {
                       <Label htmlFor="playerName">Name *</Label>
                       <Input
                         id="playerName"
+                        placeholder={individualLookupStatus === "loading" ? "Fetching..." : undefined}
                         {...individualForm.register("playerName")}
-                        className={individualForm.formState.errors.playerName ? "border-red-500" : ""}
+                        className={cn(
+                          individualForm.formState.errors.playerName ? "border-red-500" : "",
+                          individualAutoFilled.has("playerName") ? "border-emerald-300 bg-emerald-50/40" : "",
+                        )}
                       />
                       {individualForm.formState.errors.playerName ? (
                         <p className="text-red-500 text-sm">{individualForm.formState.errors.playerName.message}</p>
@@ -595,8 +773,12 @@ export default function RegistrationPage() {
                       <Input
                         id="playerEmail"
                         type="email"
+                        placeholder={individualLookupStatus === "loading" ? "Fetching..." : undefined}
                         {...individualForm.register("playerEmail")}
-                        className={individualForm.formState.errors.playerEmail ? "border-red-500" : ""}
+                        className={cn(
+                          individualForm.formState.errors.playerEmail ? "border-red-500" : "",
+                          individualAutoFilled.has("playerEmail") ? "border-emerald-300 bg-emerald-50/40" : "",
+                        )}
                       />
                       {individualForm.formState.errors.playerEmail ? (
                         <p className="text-red-500 text-sm">{individualForm.formState.errors.playerEmail.message}</p>
@@ -612,13 +794,17 @@ export default function RegistrationPage() {
                             id="playerContactNumber"
                             inputMode="numeric"
                             maxLength={10}
+                            placeholder={individualLookupStatus === "loading" ? "Fetching..." : undefined}
                             {...field}
                             onChange={(e) => {
                               const digits_only = e.target.value.replace(/\D/g, "");
                               e.target.value = digits_only.slice(0, 10);
                               field.onChange(e);
                             }}
-                            className={individualForm.formState.errors.playerContactNumber ? "border-red-500" : ""}
+                            className={cn(
+                              individualForm.formState.errors.playerContactNumber ? "border-red-500" : "",
+                              individualAutoFilled.has("playerContactNumber") ? "border-emerald-300 bg-emerald-50/40" : "",
+                            )}
                           />
                         );
                       })()}
@@ -636,8 +822,12 @@ export default function RegistrationPage() {
                       <Input
                         id="playerDob"
                         type="date"
+                        placeholder={individualLookupStatus === "loading" ? "Fetching..." : undefined}
                         {...individualForm.register("playerDob")}
-                        className={individualForm.formState.errors.playerDob ? "border-red-500" : ""}
+                        className={cn(
+                          individualForm.formState.errors.playerDob ? "border-red-500" : "",
+                          individualAutoFilled.has("playerDob") ? "border-emerald-300 bg-emerald-50/40" : "",
+                        )}
                       />
                       {individualForm.formState.errors.playerDob ? (
                         <p className="text-red-500 text-sm">{individualForm.formState.errors.playerDob.message}</p>
