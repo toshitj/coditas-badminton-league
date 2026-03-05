@@ -238,33 +238,7 @@ function PlayerFields({
   );
 }
 
-type DraftV2 = {
-  kind: "team" | "individual";
-  details: Record<string, unknown>;
-  payment: { transactionId?: string; refundUpiId?: string };
-  createdAt: string;
-};
-
 const draft_storage_key_v2 = "cbl:registration:draft:v2";
-
-function try_parse_draft(value: string | null): DraftV2 | null {
-  if (!value) return null;
-  try {
-    const parsed = JSON.parse(value) as Partial<DraftV2> | null;
-    if (!parsed || typeof parsed !== "object") return null;
-    if (parsed.kind !== "team" && parsed.kind !== "individual") return null;
-    if (!parsed.details || typeof parsed.details !== "object") return null;
-    const payment = parsed.payment && typeof parsed.payment === "object" ? parsed.payment : {};
-    return {
-      kind: parsed.kind,
-      details: parsed.details as Record<string, unknown>,
-      payment: { transactionId: payment.transactionId, refundUpiId: payment.refundUpiId },
-      createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : new Date().toISOString(),
-    };
-  } catch {
-    return null;
-  }
-}
 
 export default function RegistrationPage() {
   const { toast } = useToast();
@@ -316,23 +290,10 @@ export default function RegistrationPage() {
     setQrSrc(activeTab === "team" ? "/assets/Team-2000.JPG" : "/assets/Individual-500.JPG");
   }, [activeTab]);
 
+  // Clear any leftover draft from previous sessions on mount.
   useEffect(() => {
-    const draft = try_parse_draft(window.sessionStorage.getItem(draft_storage_key_v2));
-    if (!draft) return;
-
-    setActiveTab(draft.kind);
-    if (draft.kind === "team") teamForm.reset(draft.details as TeamDetailsFormData);
-    else individualForm.reset(draft.details as IndividualDetailsFormData);
-
-    paymentForm.reset({
-      transactionId: draft.payment.transactionId ?? "",
-      refundUpiId: draft.payment.refundUpiId ?? "",
-      paymentProof: undefined,
-    });
-
-    setFileName("");
-    if (paymentProofInputRef.current) paymentProofInputRef.current.value = "";
-  }, [individualForm, paymentForm, teamForm]);
+    try { window.sessionStorage.removeItem(draft_storage_key_v2); } catch { /* ignore */ }
+  }, []);
 
   const canProceed = useMemo(() => {
     return activeTab === "team" ? teamForm.formState.isValid : individualForm.formState.isValid;
@@ -341,58 +302,6 @@ export default function RegistrationPage() {
   const canSubmit = useMemo(() => {
     return canProceed && paymentForm.formState.isValid && hasAccepted && !isSubmitting;
   }, [canProceed, hasAccepted, isSubmitting, paymentForm.formState.isValid]);
-
-  const store_draft = (next: DraftV2) => {
-    try {
-      window.sessionStorage.setItem(draft_storage_key_v2, JSON.stringify(next));
-    } catch {
-      // ignore
-    }
-  };
-
-  useEffect(() => {
-    const subscription = teamForm.watch((value) => {
-      if (activeTab !== "team") return;
-      const payment = paymentForm.getValues();
-      store_draft({
-        kind: "team",
-        details: value as Record<string, unknown>,
-        payment: { transactionId: payment.transactionId, refundUpiId: payment.refundUpiId },
-        createdAt: new Date().toISOString(),
-      });
-    });
-    return () => subscription.unsubscribe();
-  }, [activeTab, paymentForm, teamForm]);
-
-  useEffect(() => {
-    const subscription = individualForm.watch((value) => {
-      if (activeTab !== "individual") return;
-      const payment = paymentForm.getValues();
-      store_draft({
-        kind: "individual",
-        details: value as Record<string, unknown>,
-        payment: { transactionId: payment.transactionId, refundUpiId: payment.refundUpiId },
-        createdAt: new Date().toISOString(),
-      });
-    });
-    return () => subscription.unsubscribe();
-  }, [activeTab, individualForm, paymentForm]);
-
-  useEffect(() => {
-    const subscription = paymentForm.watch((value) => {
-      const details =
-        activeTab === "team"
-          ? (teamForm.getValues() as Record<string, unknown>)
-          : (individualForm.getValues() as Record<string, unknown>);
-      store_draft({
-        kind: activeTab,
-        details,
-        payment: { transactionId: value.transactionId, refundUpiId: value.refundUpiId },
-        createdAt: new Date().toISOString(),
-      });
-    });
-    return () => subscription.unsubscribe();
-  }, [activeTab, individualForm, paymentForm, teamForm]);
 
   const build_team_payload = ({
     details,
@@ -517,9 +426,6 @@ export default function RegistrationPage() {
           setTeamName(maybe_team_name);
           setModalOpen(true);
         }
-
-        // Clear draft before reset so watch subscriptions don't write it back.
-        try { window.sessionStorage.removeItem(draft_storage_key_v2); } catch { /* ignore */ }
 
         teamForm.reset();
         individualForm.reset();
