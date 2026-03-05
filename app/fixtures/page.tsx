@@ -30,7 +30,7 @@ type FixturesApiResponse = {
 
 type FixturesTab = { key: string; label: string; fixtures: Fixture[] };
 
-const fixtures_api_url = "/api/fixtures";
+const fixtures_api_url = `${process.env.NEXT_PUBLIC_API_URL ?? ""}?action=getFixtures`;
 
 type DateInfo = { key: string; sortKey: string; label: string };
 

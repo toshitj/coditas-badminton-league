@@ -28,7 +28,7 @@ type StandingsApiResponse = {
   };
 };
 
-const standings_api_url = "/api/standings";
+const standings_api_url = `${process.env.NEXT_PUBLIC_API_URL ?? ""}?action=getStandings`;
 
 async function fetch_standings(): Promise<Standing[]> {
   const response = await fetch(standings_api_url, { method: "GET" });

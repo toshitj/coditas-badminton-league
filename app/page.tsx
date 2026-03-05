@@ -2,7 +2,6 @@
 
 import type { ComponentType, ReactNode } from "react";
 import { motion } from "framer-motion";
-export const dynamic = 'force-dynamic';
 import { AlertCircle, Calendar, Check, Clock, MapPin, Target, Users } from "lucide-react";
 
 function IconBulletList({

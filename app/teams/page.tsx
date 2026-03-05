@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-
-export const dynamic = 'force-dynamic';
 import { motion } from "framer-motion";
 import TeamCard from "@/components/TeamCard";
 import { fetchIndividuals, fetchTeams, type IndividualPlayer, type Team } from "@/lib/api";

@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";

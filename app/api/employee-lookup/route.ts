@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const HUB_BASE = "https://hub.coditas.org";
 const PROJECT = "CBL";
-// Note: move TOKEN_PASSWORD to an env variable (CODITAS_HUB_PASSWORD) for production
 const TOKEN_PASSWORD = "Xk9mN2pLqR4wS7tY";
 
 let tokenCache: { access_token: string; refresh_token: string } | null = null;
@@ -16,7 +15,6 @@ async function fetchFreshTokens(): Promise<{ access_token: string; refresh_token
   });
   if (!res.ok) throw new Error(`getTokens HTTP ${res.status}`);
   const json = await res.json();
-  // Handle both { access_token, refresh_token } and { data: { access_token, refresh_token } }
   const payload: Record<string, unknown> = json?.data ?? json;
   const access_token = String(payload.access_token ?? payload.accessToken ?? "");
   const refresh_token = String(payload.refresh_token ?? payload.refreshToken ?? "");
@@ -38,21 +36,16 @@ function extractStr(obj: Record<string, unknown>, keys: string[]): string {
   return "";
 }
 
-/** Strip non-digits and keep the last 10 digits (handles +91 prefix etc.) */
 function normalizePhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
   return digits.length > 10 ? digits.slice(-10) : digits;
 }
 
-/** Normalize date to YYYY-MM-DD for HTML date input */
 function normalizeDob(raw: string): string {
-  // Strip time component from ISO datetime (e.g. "1992-08-30T00:00:00.000Z")
   if (raw.includes("T")) raw = raw.split("T")[0];
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-  // DD/MM/YYYY or DD-MM-YYYY
   const m1 = raw.match(/^(\d{2})[/\-](\d{2})[/\-](\d{4})$/);
   if (m1) return `${m1[3]}-${m1[2]}-${m1[1]}`;
-  // M/D/YYYY or MM/DD/YYYY
   const m2 = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (m2) return `${m2[3]}-${m2[1].padStart(2, "0")}-${m2[2].padStart(2, "0")}`;
   return raw;
@@ -86,7 +79,6 @@ export async function GET(request: NextRequest) {
     let tokens = await getTokens();
     let res = await queryEmployee(employeeId, tokens);
 
-    // On auth error, clear cached tokens and retry once with fresh ones
     if (res.status === 401 || res.status === 403) {
       tokenCache = null;
       tokens = await fetchFreshTokens();
@@ -102,7 +94,6 @@ export async function GET(request: NextRequest) {
     }
 
     const json = await res.json();
-    // Handle both flat and data-wrapped responses
     const raw: Record<string, unknown> = json?.data ?? json;
 
     const rawPhone = extractStr(raw, [

@@ -1,8 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";

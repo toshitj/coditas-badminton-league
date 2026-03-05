@@ -1,10 +1,6 @@
 import axios from "axios";
 
-// Using Next.js API proxy to avoid CORS issues
-const API_URL = "/api/proxy";
-const REGISTRATION_API_URL = "/api/register";
-const INDIVIDUAL_REGISTRATION_API_URL = "/api/register-individual";
-const VALIDATE_EMAILS_API_URL = "/api/validate-emails";
+const GAS_MAIN_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export type RegistrationPayload = Record<string, string>;
 
@@ -45,10 +41,8 @@ export const registerTeam = async (
   payload: RegistrationPayload
 ): Promise<RegistrationResponse> => {
   try {
-    const response = await axios.post<RegistrationResponse>(REGISTRATION_API_URL, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    const response = await axios.post<RegistrationResponse>(GAS_MAIN_URL, payload, {
+      headers: { "Content-Type": "text/plain" },
     });
     return response.data;
   } catch (error) {
@@ -61,10 +55,8 @@ export const registerIndividual = async (
   payload: RegistrationPayload
 ): Promise<RegistrationResponse> => {
   try {
-    const response = await axios.post<RegistrationResponse>(INDIVIDUAL_REGISTRATION_API_URL, payload, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await axios.post<RegistrationResponse>(GAS_MAIN_URL, payload, {
+      headers: { "Content-Type": "text/plain" },
     });
     return response.data;
   } catch (error) {
@@ -81,8 +73,8 @@ export const fetchTeams = async (): Promise<Team[]> => {
       totalTeams: number;
       teams: Team[];
       isRegistrationClosed?: boolean;
-    }>(`/api/teams?_ts=${cache_bust}`);
-    
+    }>(`${GAS_MAIN_URL}?action=teams&_ts=${cache_bust}`);
+
     if (response.data.success && Array.isArray(response.data.teams)) {
       return response.data.teams;
     }
@@ -101,7 +93,7 @@ export const fetchIndividuals = async (): Promise<IndividualPlayer[]> => {
       totalIndividuals: number;
       individuals: IndividualPlayer[];
       isRegistrationClosed?: boolean;
-    }>(`/api/individuals?_ts=${cache_bust}`);
+    }>(`${GAS_MAIN_URL}?action=individuals&_ts=${cache_bust}`);
 
     if (response.data.success && Array.isArray(response.data.individuals)) {
       return response.data.individuals;
@@ -132,7 +124,6 @@ function read_registration_closed_from_storage(): RegistrationClosedCache | null
     // ignore
   }
 
-  // Backward-compat: previous versions stored just "true"/"false".
   try {
     const raw_v1 = window.localStorage.getItem(registration_closed_storage_key_v1);
     if (raw_v1 === "true") return { value: true, fetchedAtMs: 0 };
@@ -160,7 +151,7 @@ async function fetch_is_registration_closed_uncached(): Promise<boolean> {
   const response = await axios.get<{
     success: boolean;
     isRegistrationClosed?: boolean;
-  }>(`/api/teams?_ts=${cache_bust}`);
+  }>(`${GAS_MAIN_URL}?action=teams&_ts=${cache_bust}`);
 
   if (!response.data?.success) return false;
   return response.data.isRegistrationClosed === true;
@@ -213,24 +204,4 @@ export const convertFileToBase64 = (file: File): Promise<string> => {
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = (error) => reject(error);
   });
-};
-
-export const validateEmailsBeforePayment = async ({
-  emails,
-}: {
-  emails: string[];
-}): Promise<{ conflicts: string[] }> => {
-  try {
-    const response = await axios.post<{ success: boolean; conflicts: string[] }>(
-      VALIDATE_EMAILS_API_URL,
-      { emails },
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-    if (response.data?.success && Array.isArray(response.data.conflicts)) return { conflicts: response.data.conflicts };
-    return { conflicts: [] };
-  } catch (error) {
-    console.error("Validate emails error:", error);
-    throw new Error("Failed to validate emails. Please try again.");
-  }
 };
