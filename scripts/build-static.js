@@ -30,10 +30,7 @@ try {
     console.log("Moved app/api -> _api_backup (excluded from static export)");
   }
 
-  execSync("npx next build", {
-    stdio: "inherit",
-    env: { ...process.env, STATIC_EXPORT: "true" },
-  });
+  execSync("npx next build", { stdio: "inherit" });
 } finally {
   if (has_api && fs.existsSync(api_backup)) {
     rm_dir(api_dir);
