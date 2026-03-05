@@ -22,11 +22,13 @@ export default function TeamCard({ team }: TeamCardProps) {
     >
       <div className="p-6">
         <div className="flex items-center gap-3 mb-2">
-          <Users className="w-6 h-6 text-neon-blue" />
-          <h3 className="text-xl font-bold">{team.teamName}</h3>
+          <div className="p-1.5 rounded-lg" style={{ background: "linear-gradient(135deg, #9900E6, #11CAE6)" }}>
+            <Users className="w-4 h-4 text-white" />
+          </div>
+          <h3 className="text-xl font-bold font-urbanist">{team.teamName}</h3>
         </div>
-        
-        <p className="text-sm text-gray-400 mb-4">
+
+        <p className="text-sm text-brand-grey1 mb-4">
           {isExpanded ? "Click to collapse" : "Click to view details"}
         </p>
 
@@ -37,10 +39,10 @@ export default function TeamCard({ team }: TeamCardProps) {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="space-y-4 pt-4 border-t border-white/10"
+              className="space-y-4 pt-4 border-t border-border/40"
             >
               <div>
-                <h4 className="text-sm font-semibold text-neon-blue mb-2">
+                <h4 className="text-sm font-semibold text-brand-violet mb-2">
                   Players
                 </h4>
                 <div className="space-y-2 ml-4">

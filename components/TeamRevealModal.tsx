@@ -48,20 +48,20 @@ export default function TeamRevealModal({
         ...defaults,
         particleCount,
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        colors: ["#00D9FF", "#00FF94", "#FFFFFF"],
+        colors: ["#9900E6", "#11CAE6", "#FF174F", "#5B0FFE", "#FFFFFF"],
       });
       confetti({
         ...defaults,
         particleCount,
         origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        colors: ["#00D9FF", "#00FF94", "#FFFFFF"],
+        colors: ["#9900E6", "#11CAE6", "#FF174F", "#5B0FFE", "#FFFFFF"],
       });
     }, 250);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="border-neon-blue max-w-lg">
+      <DialogContent className="border-brand-violet max-w-lg">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -98,7 +98,8 @@ export default function TeamRevealModal({
                   whileTap={{ scale: 0.95 }}
                 >
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-neon-blue/20 to-neon-green/20"
+                    className="absolute inset-0"
+                    style={{ background: "linear-gradient(135deg, rgba(153,0,230,0.15), rgba(17,202,230,0.15))" }}
                     animate={{
                       x: ["-100%", "100%"],
                     }}
@@ -108,7 +109,7 @@ export default function TeamRevealModal({
                       ease: "linear",
                     }}
                   />
-                  <span className="text-xl font-bold relative z-10">
+                  <span className="text-xl font-bold relative z-10 font-urbanist">
                     ✨ Click to Reveal ✨
                   </span>
                 </motion.button>

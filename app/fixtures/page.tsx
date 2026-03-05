@@ -160,7 +160,7 @@ function FixtureCard({ fixture }: { fixture: Fixture }) {
           <span className="text-slate-500">Venue:</span>{" "}
           <span className="text-slate-900 font-semibold">{fixture.venue || "TBD"}</span>
         </div>
-        <div className="text-xs px-3 py-1 rounded-full bg-white/70 border border-border text-slate-700">
+        <div className="text-xs px-3 py-1 rounded-full border text-brand-violet border-brand-violet/30 bg-brand-violet/5 font-medium">
           {fixture.stage}
           {fixture.group ? ` • Group ${fixture.group}` : ""}
         </div>

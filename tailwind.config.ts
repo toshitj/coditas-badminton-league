@@ -52,10 +52,24 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Coditas brand colors
         neon: {
-          blue: "#3581B8",
-          green: "#A1CDF4",
+          blue: "#9900E6",    // Coditas Primary Violet
+          green: "#11CAE6",   // Coditas Turquoise
         },
+        brand: {
+          violet: "#9900E6",
+          turquoise: "#11CAE6",
+          red: "#FF174F",
+          purple: "#5B0FFE",
+          text: "#171717",
+          grey1: "#736A85",
+          grey2: "#EBE9EF",
+          grey3: "#f5f5f5",
+        },
+      },
+      fontFamily: {
+        urbanist: ["var(--font-urbanist)", "Urbanist", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

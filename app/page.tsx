@@ -34,27 +34,19 @@ export default function OverviewPage() {
         transition={{ duration: 0.6 }}
         className="relative"
       >
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <motion.svg
-            className="absolute right-0 top-0 w-96 h-96 opacity-10"
-            viewBox="0 0 200 200"
-            animate={{
-              rotate: [0, 360],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          >
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3581B8" />
-                <stop offset="100%" stopColor="#A1CDF4" />
-              </linearGradient>
-            </defs>
-          </motion.svg>
+        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full opacity-10"
+            style={{ background: "radial-gradient(circle, #9900E6 0%, #11CAE6 70%, transparent 100%)" }}
+            animate={{ scale: [1, 1.15, 1] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute left-0 bottom-0 w-[400px] h-[400px] rounded-full opacity-[0.06]"
+            style={{ background: "radial-gradient(circle, #5B0FFE 0%, #11CAE6 70%, transparent 100%)" }}
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          />
         </div>
 
         <div className="text-center space-y-6 mb-16">
@@ -84,7 +76,7 @@ export default function OverviewPage() {
           transition={{ delay: 1.1 }}
         >
           <div className="glass rounded-xl p-8 max-w-5xl mx-auto text-left">
-            <h2 className="text-3xl font-bold mb-2 text-neon-blue tracking-tight">
+            <h2 className="text-3xl font-bold mb-2 neon-text tracking-tight">
               Official Rule Book
             </h2>
             <p className="text-slate-600 leading-relaxed">
@@ -93,7 +85,7 @@ export default function OverviewPage() {
 
             <div className="mt-6 space-y-6">
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Tournament Timeline</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Tournament Timeline</h3>
                 <IconBulletList
                   icon={Calendar}
                   items={[
@@ -109,7 +101,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Schedule &amp; Availability</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Schedule &amp; Availability</h3>
                 <IconBulletList
                   icon={Clock}
                   items={[
@@ -123,7 +115,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Team Structure &amp; Composition</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Team Structure &amp; Composition</h3>
                 <IconBulletList
                   icon={Users}
                   items={[
@@ -139,7 +131,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-3">
-                <h3 className="text-lg font-semibold text-neon-blue">Match Format &amp; Categories</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Match Format &amp; Categories</h3>
                 <p className="text-sm text-slate-700">
                   Each tie is Best of 3 categories. A team must win at least 2 out of 3 to win the tie.
                 </p>
@@ -177,7 +169,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Tournament Stages &amp; Progression</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Tournament Stages &amp; Progression</h3>
                 <IconBulletList
                   icon={Target}
                   items={[
@@ -198,7 +190,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Scoring &amp; Tie-Breakers</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Scoring &amp; Tie-Breakers</h3>
                 <p className="text-sm text-slate-700">
                   Standard BWF scoring applies. For group standings, if two teams have equal points, the tie-breaker is <span className="font-semibold">Point Difference</span>:
                 </p>
@@ -208,7 +200,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Attendance &amp; Rescheduling</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Attendance &amp; Rescheduling</h3>
                 <IconBulletList
                   icon={AlertCircle}
                   items={[
@@ -223,7 +215,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">General Rules &amp; Conduct</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">General Rules &amp; Conduct</h3>
                 <IconBulletList
                   icon={Check}
                   items={[
@@ -240,7 +232,7 @@ export default function OverviewPage() {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-lg font-semibold text-neon-blue">Fees &amp; Venue</h3>
+                <h3 className="text-lg font-semibold text-brand-violet">Fees &amp; Venue</h3>
                 <IconBulletList
                   icon={MapPin}
                   items={[

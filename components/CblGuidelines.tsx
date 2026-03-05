@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export default function CblGuidelines({ className }: { className?: string }) {
   return (
     <aside className={cn("glass rounded-xl p-6 md:p-8", className)}>
-      <h2 className="text-2xl font-bold mb-4 text-neon-blue">Guidelines</h2>
+      <h2 className="text-2xl font-bold mb-4 font-urbanist neon-text">Guidelines</h2>
 
       <div className="space-y-5 text-sm text-slate-700 leading-relaxed max-h-[70vh] overflow-auto pr-2">
         <p className="font-semibold text-slate-900">Please read the guidelines carefully before signing up.</p>

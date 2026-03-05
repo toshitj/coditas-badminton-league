@@ -13,7 +13,7 @@ export default function CblDisclaimer({
 }) {
   return (
     <aside className={cn("glass rounded-xl p-6 md:p-8", className)}>
-      <h2 className="text-2xl font-bold mb-4 text-neon-blue">Disclaimer</h2>
+      <h2 className="text-2xl font-bold mb-4 font-urbanist neon-text">Disclaimer</h2>
 
       <div className="space-y-5 text-sm text-slate-700 leading-relaxed max-h-[70vh] overflow-auto pr-2">
         <section className="space-y-2">
@@ -131,7 +131,7 @@ export default function CblDisclaimer({
         <label className="flex items-start gap-3 text-sm text-slate-700">
           <input
             type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-border"
+            className="mt-1 h-4 w-4 rounded border-border accent-brand-violet"
             checked={accepted}
             onChange={(e) => onAcceptedChange(e.target.checked)}
           />

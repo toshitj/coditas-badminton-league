@@ -4,35 +4,42 @@
 
 @layer base {
   :root {
-    /* Light theme palette */
-    --background: 110 30% 96%; /* #F3F8F2 */
-    --foreground: 215 28% 17%;
+    /* Coditas brand theme */
+    --background: 270 25% 97%; /* subtle lavender-white */
+    --foreground: 0 0% 9%;     /* #171717 brand body text */
 
     --card: 0 0% 100%;
-    --card-foreground: 215 28% 17%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 28% 17%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 205 55% 46%; /* #3581B8 */
+    --primary: 280 100% 45%;   /* #9900E6 Coditas Violet */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 208 79% 79%; /* #A1CDF4 */
-    --secondary-foreground: 215 28% 17%;
+    --secondary: 188 86% 48%;  /* #11CAE6 Coditas Turquoise */
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 110 20% 93%;
-    --muted-foreground: 215 16% 40%;
+    --muted: 270 15% 93%;
+    --muted-foreground: 270 8% 40%;
 
-    --accent: 208 79% 79%;
-    --accent-foreground: 215 28% 17%;
+    --accent: 188 86% 48%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 208 28% 86%;
-    --input: 208 28% 86%;
-    --ring: 205 55% 46%;
+    --border: 270 18% 88%;
+    --input: 270 18% 88%;
+    --ring: 280 100% 45%;
     --radius: 0.5rem;
+
+    /* Coditas brand CSS variables */
+    --coditas-violet: #9900E6;
+    --coditas-turquoise: #11CAE6;
+    --coditas-red: #FF174F;
+    --coditas-purple: #5B0FFE;
+    --coditas-gradient: linear-gradient(135deg, #9900E6, #11CAE6);
   }
 }
 
@@ -44,23 +51,43 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  h1, h2 {
+    font-family: var(--font-urbanist, "Urbanist", sans-serif);
+  }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-border shadow-sm;
+    @apply bg-white/75 backdrop-blur-md border border-border shadow-sm;
   }
-  
+
   .glass-hover {
-    @apply hover:bg-white/90 hover:shadow-md transition-all duration-300;
+    @apply hover:bg-white/95 hover:shadow-md transition-all duration-300;
   }
-  
+
   .neon-border {
     @apply border-2 border-neon-blue/40 shadow-sm;
   }
-  
+
+  /* Gradient text using Coditas brand violet → turquoise */
   .neon-text {
-    @apply text-neon-blue;
+    background: linear-gradient(135deg, #9900E6, #11CAE6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Gradient background utility */
+  .coditas-gradient {
+    background: linear-gradient(135deg, #9900E6, #11CAE6);
+  }
+
+  .coditas-gradient-text {
+    background: linear-gradient(135deg, #9900E6, #11CAE6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 

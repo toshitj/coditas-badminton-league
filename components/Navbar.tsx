@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -54,33 +55,48 @@ export default function Navbar() {
   }, [isRegistrationClosed]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="container flex justify-center mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex gap-1 md:gap-2">
+    <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16 gap-4">
+          {/* Coditas Logo */}
+          <Link href="/" className="shrink-0">
+            <Image
+              src="https://coditas-brand-assets.web.app/logos/gradient.png"
+              alt="Coditas"
+              width={110}
+              height={28}
+              className="h-7 w-auto object-contain"
+              priority
+              unoptimized
+            />
+          </Link>
+
+          {/* Nav Items */}
+          <div className="flex items-center gap-0.5 md:gap-1 overflow-x-auto">
             {navItems.map((item) => {
               const isActive = pathname === item.path;
               return (
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={cn("relative", item.isVisible ? "" : "hidden")}
+                  className={cn("relative shrink-0", item.isVisible ? "" : "hidden")}
                 >
                   <div
                     className={cn(
-                      "px-3 md:px-4 py-2 text-sm md:text-base rounded-md transition-colors",
+                      "px-2.5 md:px-4 py-2 text-sm rounded-md transition-colors font-medium",
                       isActive
-                        ? "text-neon-blue"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "text-brand-violet"
+                        : "text-slate-600 hover:text-brand-violet"
                     )}
                   >
                     {item.name}
                   </div>
-                  
+
                   {isActive && (
                     <motion.div
                       layoutId="navbar-indicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-neon-blue"
+                      className="absolute bottom-0 left-0 right-0 h-0.5"
+                      style={{ background: "linear-gradient(90deg, #9900E6, #11CAE6)" }}
                       transition={{
                         type: "spring",
                         stiffness: 380,
