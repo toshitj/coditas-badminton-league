@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "coditas-brand-assets.web.app",
         pathname: "/logos/**",
       },
+      {
+        protocol: "https",
+        hostname: "people.zoho.in",
+        pathname: "/**",
+      },
     ],
   },
 };

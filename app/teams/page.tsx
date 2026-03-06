@@ -313,8 +313,7 @@ export default function TeamsPage() {
                           )}
                         </span>
                       </th>
-                      <th className="py-4 px-4 text-left font-semibold text-slate-700">Jersey Name</th>
-                    </tr>
+                                          </tr>
                   </thead>
                   <tbody>
                     {filteredAndSortedIndividuals.map((p, index) => (
@@ -337,8 +336,7 @@ export default function TeamsPage() {
                             {p.gender}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-700">{p.jerseyName || "-"}</td>
-                      </tr>
+                                              </tr>
                     ))}
                   </tbody>
                 </table>

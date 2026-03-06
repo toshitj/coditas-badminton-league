@@ -3,15 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState } from "react";
 import { fetchIsRegistrationClosedCached } from "@/lib/api";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const registration_closed_storage_key = "cbl:isRegistrationClosed";
   const [isRegistrationClosed, setIsRegistrationClosed] = useState<boolean | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let is_active = true;
@@ -40,6 +42,11 @@ export default function Navbar() {
     };
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   const navItems = useMemo(() => {
     // Keep DOM structure stable to prevent hydration errors.
     const can_show_registration = isRegistrationClosed === false;
@@ -51,6 +58,7 @@ export default function Navbar() {
       { name: "Registered Teams", path: "/teams", isVisible: true },
       { name: "Match Fixtures", path: "/fixtures", isVisible: can_show_fixtures },
       { name: "Standings", path: "/standings", isVisible: can_show_fixtures },
+      { name: "Committee", path: "/committee", isVisible: true },
     ];
   }, [isRegistrationClosed]);
 
@@ -70,8 +78,8 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Nav Items */}
-          <div className="flex items-center gap-0.5 md:gap-1 overflow-x-auto">
+          {/* Desktop Nav Items */}
+          <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = pathname === item.path;
               return (
@@ -82,7 +90,7 @@ export default function Navbar() {
                 >
                   <div
                     className={cn(
-                      "px-2.5 md:px-4 py-2 text-sm rounded-md transition-colors font-medium",
+                      "px-4 py-2 text-sm rounded-md transition-colors font-medium",
                       isActive
                         ? "text-brand-violet"
                         : "text-slate-600 hover:text-brand-violet"
@@ -107,8 +115,53 @@ export default function Navbar() {
               );
             })}
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            className="md:hidden p-2 rounded-lg text-slate-600 hover:text-brand-violet hover:bg-slate-100 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden border-t border-border overflow-hidden"
+            style={{ backgroundColor: "#ffffff" }}
+          >
+            <div className="container mx-auto px-4 py-4 space-y-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={cn(
+                      "block px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                      item.isVisible ? "" : "hidden",
+                      isActive
+                        ? "bg-brand-violet/10 text-brand-violet"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-brand-violet"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
