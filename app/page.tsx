@@ -3,7 +3,7 @@
 import type { ComponentType, ReactNode } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { AlertCircle, Calendar, Check, Clock, MapPin, Target, Users } from "lucide-react";
+import { AlertCircle, Calendar, Check, Clock, Gift, MapPin, Medal, Target, Trophy, Users } from "lucide-react";
 
 function IconBulletList({
   icon: Icon,
@@ -182,6 +182,92 @@ export default function OverviewPage() {
             A high-energy badminton league at Coditas. Register as a full team or as an individual, then compete in a best-of-3 tie format across Singles and Mixed Doubles.
           </motion.p>
         </div>
+
+        {/* Prizes & Rewards Section */}
+        <motion.div
+          className="mt-12 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold mb-8 neon-text text-center">
+            Prizes & Rewards
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Every Player */}
+            <div className="glass rounded-xl p-6 text-center">
+              <div className="w-14 h-14 rounded-full bg-brand-violet/10 flex items-center justify-center mx-auto mb-4">
+                <Gift className="w-7 h-7 text-brand-violet" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3">Every Player</h3>
+              <ul className="text-sm text-slate-600 space-y-2 text-left">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Guaranteed to play at least 3 matches</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Jerseys</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Refreshments with water bottles</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Exciting surprise goodies</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Runner-up Team */}
+            <div className="glass rounded-xl p-6 text-center">
+              <div className="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4">
+                <Medal className="w-7 h-7 text-slate-500" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3">Runner-up Team</h3>
+              <ul className="text-sm text-slate-600 space-y-2 text-left">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span className="font-semibold">Cash prize of ₹7,000</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Medals</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Framed certificates</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Winning Team */}
+            <div className="glass rounded-xl p-6 text-center border-2 border-yellow-400/50 relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-bl-lg">
+                CHAMPIONS
+              </div>
+              <div className="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
+                <Trophy className="w-7 h-7 text-yellow-500" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3">Winning Team</h3>
+              <ul className="text-sm text-slate-600 space-y-2 text-left">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span className="font-semibold">Cash prize of ₹10,000</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Medals</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <span>Framed certificates</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </motion.div>
 
         <motion.div
           className="mt-10 text-center"
