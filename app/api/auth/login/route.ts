@@ -58,18 +58,21 @@ export async function GET() {
   const response = NextResponse.redirect(authorizationUrl);
 
   // Store state and code verifier in cookies for verification in callback
+  // Use sameSite: "none" with secure: true for cross-origin OAuth redirects
+  const isProduction = process.env.NODE_ENV === "production";
+
   response.cookies.set("oauth_state", state, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 60 * 10, // 10 minutes
     path: "/",
   });
 
   response.cookies.set("oauth_code_verifier", codeVerifier, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 60 * 10, // 10 minutes
     path: "/",
   });
