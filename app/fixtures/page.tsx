@@ -7,7 +7,8 @@ import { fetch_fixtures } from "./api";
 import { build_tabs_from_fixtures } from "./utils/date";
 import { enrich_with_knockout_placeholders } from "./utils/knockout";
 import { DateTabs } from "./components/DateTabs";
-import { FixtureCard } from "./components/FixtureCard";
+import { TimeSlotSection } from "./components/TimeSlotSection";
+import { group_by_time_slot } from "./utils/time-slots";
 import type { Fixture } from "./types";
 
 const ACTIVE_TAB_STORAGE_KEY = "cbl:fixtures:active_tab";
@@ -96,10 +97,18 @@ export default function FixturesPage() {
               ) : !active || active.fixtures.length === 0 ? (
                 <div className="text-center text-slate-600 py-12">No fixtures available.</div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {active.fixtures.map((fixture, i) => (
-                    <FixtureCard key={fixture.matchId} fixture={fixture} index={i} />
-                  ))}
+                <div className="space-y-10">
+                  {group_by_time_slot(active.fixtures).map((slot, slotIdx, all) => {
+                    const offset = all.slice(0, slotIdx).reduce((sum, s) => sum + s.fixtures.length, 0);
+                    return (
+                      <TimeSlotSection
+                        key={slot.slotKey}
+                        slotLabel={slot.slotLabel}
+                        fixtures={slot.fixtures}
+                        cardIndexOffset={offset}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </motion.div>
